@@ -31,6 +31,12 @@ import { computeLinkPerformance } from "../../services/affiliateEarnings";
 import { CurrencyCode, formatCurrency } from "../../utils/currency";
 import { siteUrl } from "@/lib/site";
 import { getUserFacingErrorMessage } from "../../utils/userFacingError";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { affiliateTab } from "./AffiliateTable";
+import { AffiliateHistory } from "./AffiliateHistory";
+import { PersonalAffiliateRevenue } from "./PersonalAffiliateRevenue";
+import { matchesAffiliateSale } from "./affiliatePresentation";
 
 interface AffiliatesViewProps {
   lang?: "fr" | "en";
@@ -40,7 +46,7 @@ interface AffiliatesViewProps {
   isPersonalWorkspace?: boolean;
   currency?: CurrencyCode | string;
   /** Sample data for the visual preview page: skips loading and link storage. */
-  demo?: { products: AffiliateProduct[]; links: AffiliateLink[]; invitations: AffiliateInvitation[] };
+  demo?: { products: AffiliateProduct[]; links: AffiliateLink[]; invitations: AffiliateInvitation[]; companyNames?: Record<string, string> };
 }
 
 const percentLabel = (rate: number) => `${String(rate)} %`;
@@ -101,8 +107,9 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
       }
       if (demo) {
         setProducts(demo.products);
-        setLinks(demo.links);
-        setInvitations(demo.invitations);
+        const own = demo.links.filter((link) => link.affiliateUid === affiliateUid);
+        setLinks(own);
+        setInvitations(demo.invitations.filter((sale) => own.some((link) => matchesAffiliateSale(sale, link))));
         setLoading(false);
         setRefreshing(false);
         return;
@@ -114,11 +121,12 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
         const [eligibleProducts, ownLinks, invitationHistory] = await Promise.all([
           getAffiliateEligibleProducts(affiliateUid),
           getAffiliateLinksForUser(affiliateUid),
-          getAffiliateInvitationHistory(affiliateUid).catch(() => []),
+          getAffiliateInvitationHistory(affiliateUid),
         ]);
         setProducts(eligibleProducts);
-        setLinks(ownLinks);
-        setInvitations(invitationHistory);
+        const own = ownLinks.filter((link) => link.affiliateUid === affiliateUid);
+        setLinks(own);
+        setInvitations(invitationHistory.filter((sale) => own.some((link) => matchesAffiliateSale(sale, link))));
       } catch (error) {
         console.error("Affiliate programs load failed:", error);
         setLoadError(getUserFacingErrorMessage(error, "Impossible de charger les programmes affiliés. Réessayez."));
@@ -138,7 +146,6 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
   }, [refresh]);
 
   const myPerformance = useMemo(() => computeLinkPerformance(links, invitations), [links, invitations]);
-  const myTotals = myPerformance.reduce((t, p) => ({ sales: t.sales + p.sales, commission: t.commission + p.commission }), { sales: 0, commission: 0 });
   const productLinks = useMemo(() => new Map(links.map((link) => [link.productId, link])), [links]);
 
   const beginPromotion = (product: AffiliateProduct) => {
@@ -399,22 +406,13 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
           {loadError}
         </p>
       )}
-      {!loading && !loadError && links.length > 0 && (
-        <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4" aria-labelledby="my-earnings-heading">
-          <h2 id="my-earnings-heading" className="text-base font-bold">Mes gains</h2>
-          <p className="mt-1 text-sm text-zinc-300 tabular-nums">
-            {myTotals.sales} vente{myTotals.sales > 1 ? "s" : ""} confirmée{myTotals.sales > 1 ? "s" : ""} · {formatCurrency(myTotals.commission, currency as CurrencyCode)} de commissions
-          </p>
-          <ul className="mt-3 space-y-1 border-t border-white/[0.06] pt-3 text-xs text-zinc-300">
-            {myPerformance.map((p) => (
-              <li key={p.link.id} className="flex flex-wrap justify-between gap-2">
-                <span className="break-words">{p.link.productName} ({percentLabel(p.link.commissionRate)})</span>
-                <span className="tabular-nums">{p.sales} vente{p.sales > 1 ? "s" : ""} · {formatCurrency(p.commission, currency as CurrencyCode)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Tabs defaultValue="revenue" className="mt-5">
+        <TabsList className="h-auto w-full justify-start overflow-x-auto rounded-none border-b border-border bg-transparent p-0">
+          <TabsTrigger value="revenue" className={affiliateTab}>Revenu</TabsTrigger>
+          <TabsTrigger value="history" className={affiliateTab}>Historique</TabsTrigger>
+        </TabsList>
+        <TabsContent value="revenue">
+      {!loading && !loadError && <PersonalAffiliateRevenue performance={myPerformance} products={products} currency={currency} {...(demo?.companyNames ? { companyNames: demo.companyNames } : {})} />}
       <section className="mt-6" aria-labelledby="affiliate-products-heading">
         <h2 id="affiliate-products-heading" className="mb-3 text-base font-bold">
           Produits disponibles
@@ -568,6 +566,12 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
           </div>
         )}
       </section>
+        </TabsContent>
+        <TabsContent value="history" className="py-6">
+          <h2 className="mb-4 text-base font-semibold">Historique des parrainages</h2>
+          {loading ? <p role="status" className="py-8 text-muted-foreground">Chargement de l’historique…</p> : !loadError && <AffiliateHistory sales={invitations} links={links} currency={currency} />}
+        </TabsContent>
+      </Tabs>
       {showInvitationHistory && (
         <div
           onClick={(event) => {

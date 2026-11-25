@@ -30,6 +30,8 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - When legacy Firestore is absent, affiliate catalog reads use the existing offers client and only explicit commission metadata; this avoids configuration crashes and invented programs. Affiliate links must not be fabricated before a persistent link store is connected.
+- Affiliate presentation uses shared table/history adapters; creator rows are restricted to the active company's exact offer IDs, and personal history requires attributable own links, to avoid cross-workspace totals.
+- Affiliate commission editing opens the existing offer editor; instructions remain a visibly unpublished draft until storage exists, to avoid claiming unsupported persistence.
 
 ## User-requested product and UX requirements
 

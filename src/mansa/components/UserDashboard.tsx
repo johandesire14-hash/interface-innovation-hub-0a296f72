@@ -4132,7 +4132,24 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                 </div>
               ) : activeWorkspaceId !== "personnel" ? (
                 <React.Suspense fallback={<DashboardProductsSkeleton />}>
-                  <CreatorAffiliatesView currency={currency} companyName={activeCompany?.name} />
+                  <CreatorAffiliatesView
+                    key={activeWorkspaceId}
+                    currency={currency}
+                    {...(activeCompany ? { companyName: activeCompany.name } : {})}
+                    offers={contextProducts.map((product) => ({
+                      id: product.id,
+                      name: product.name,
+                      ...(projects.find((project) => project.id === product.id)?.affiliateCommissionRate !== undefined
+                        ? { rate: projects.find((project) => project.id === product.id)?.affiliateCommissionRate }
+                        : {}),
+                    }))}
+                    onEditOffer={(id) => {
+                      const product = contextProducts.find((offer) => offer.id === id);
+                      if (!product) return;
+                      setEditingProduct(product);
+                      setIsProductStudioOpen(true);
+                    }}
+                  />
                 </React.Suspense>
               ) : (
                 <AffiliatesView
