@@ -94,6 +94,9 @@ const CustomersView = React.lazy(() =>
 const WebsitesView = React.lazy(() =>
   import("./dashboard/WebsitesView").then((m) => ({ default: m.WebsitesView })),
 );
+const CreatorAffiliatesView = React.lazy(() =>
+  import("./dashboard/CreatorAffiliatesView").then((m) => ({ default: m.CreatorAffiliatesView })),
+);
 const AffiliatesView = React.lazy(() =>
   import("./dashboard/AffiliatesView").then((m) => ({ default: m.AffiliatesView })),
 );
@@ -4127,6 +4130,10 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                 <div className="max-w-7xl mx-auto space-y-5">
                   <DashboardProductsSkeleton />
                 </div>
+              ) : activeWorkspaceId !== "personnel" ? (
+                <React.Suspense fallback={<DashboardProductsSkeleton />}>
+                  <CreatorAffiliatesView currency={currency} companyName={activeCompany?.name} />
+                </React.Suspense>
               ) : (
                 <AffiliatesView
                   lang={lang}

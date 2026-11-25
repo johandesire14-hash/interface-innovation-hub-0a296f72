@@ -27,6 +27,7 @@ import {
   AffiliateInvitation,
   getAffiliateInvitationHistory,
 } from "../../services/affiliateHistoryService";
+import { computeLinkPerformance } from "../../services/affiliateEarnings";
 import { CurrencyCode, formatCurrency } from "../../utils/currency";
 import { siteUrl } from "@/lib/site";
 import { getUserFacingErrorMessage } from "../../utils/userFacingError";
@@ -136,6 +137,8 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
     void refresh();
   }, [refresh]);
 
+  const myPerformance = useMemo(() => computeLinkPerformance(links, invitations), [links, invitations]);
+  const myTotals = myPerformance.reduce((t, p) => ({ sales: t.sales + p.sales, commission: t.commission + p.commission }), { sales: 0, commission: 0 });
   const productLinks = useMemo(() => new Map(links.map((link) => [link.productId, link])), [links]);
 
   const beginPromotion = (product: AffiliateProduct) => {
@@ -395,6 +398,22 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
         >
           {loadError}
         </p>
+      )}
+      {!loading && !loadError && links.length > 0 && (
+        <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4" aria-labelledby="my-earnings-heading">
+          <h2 id="my-earnings-heading" className="text-base font-bold">Mes gains</h2>
+          <p className="mt-1 text-sm text-zinc-300 tabular-nums">
+            {myTotals.sales} vente{myTotals.sales > 1 ? "s" : ""} confirmée{myTotals.sales > 1 ? "s" : ""} · {formatCurrency(myTotals.commission, currency as CurrencyCode)} de commissions
+          </p>
+          <ul className="mt-3 space-y-1 border-t border-white/[0.06] pt-3 text-xs text-zinc-300">
+            {myPerformance.map((p) => (
+              <li key={p.link.id} className="flex flex-wrap justify-between gap-2">
+                <span className="break-words">{p.link.productName} ({percentLabel(p.link.commissionRate)})</span>
+                <span className="tabular-nums">{p.sales} vente{p.sales > 1 ? "s" : ""} · {formatCurrency(p.commission, currency as CurrencyCode)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
       <section className="mt-6" aria-labelledby="affiliate-products-heading">
         <h2 id="affiliate-products-heading" className="mb-3 text-base font-bold">
