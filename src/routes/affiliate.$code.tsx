@@ -7,7 +7,17 @@ import {
 } from "@/mansa/services/affiliateService";
 import { CurrencyCode, formatCurrency } from "@/mansa/utils/currency";
 
-export const Route = createFileRoute("/affiliate/$code")({ component: PublicAffiliateLandingPage });
+export const Route = createFileRoute("/affiliate/$code")({
+  head: () => ({ meta: [
+    { title: "Offre partagée — afhub" },
+    { name: "description", content: "Découvrez une offre partagée par un affilié afhub." },
+    { property: "og:title", content: "Offre partagée — afhub" },
+    { property: "og:description", content: "Découvrez une offre partagée par un affilié afhub." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: PublicAffiliateLandingPage,
+});
 
 function PublicAffiliateLandingPage() {
   const { code } = Route.useParams();

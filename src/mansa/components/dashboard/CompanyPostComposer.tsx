@@ -140,9 +140,7 @@ export const CompanyPostComposer: React.FC<CompanyPostComposerProps> = ({
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center overflow-hidden rounded-full mansa-profile-avatar text-xs font-bold">
-              {avatarInitials || companyName.slice(0, 2).toUpperCase() || "CO"}
-            </div>
+
             <div>
               <h2 id="post-composer-title" className="text-sm font-bold text-white">
                 Créer une publication

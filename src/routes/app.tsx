@@ -4,7 +4,17 @@ import { AppLoadingScreen } from "@/mansa/components/common/AppLoadingScreen";
 import { useAuth } from "@/mansa/context/AuthContext";
 import App from "@/mansa/App";
 
-export const Route = createFileRoute("/app")({ component: AppRoute });
+export const Route = createFileRoute("/app")({
+  head: () => ({ meta: [
+    { title: "Mon espace — afhub" },
+    { name: "description", content: "Votre espace personnel et vos entreprises sur afhub." },
+    { property: "og:title", content: "Mon espace — afhub" },
+    { property: "og:description", content: "Votre espace personnel et vos entreprises sur afhub." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: AppRoute,
+});
 
 function AppRoute() {
   const { user, loading } = useAuth();

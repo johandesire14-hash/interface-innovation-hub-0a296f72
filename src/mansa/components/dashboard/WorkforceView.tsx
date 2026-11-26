@@ -165,7 +165,7 @@ export const WorkforceView: React.FC<WorkforceViewProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -281,9 +281,7 @@ export const WorkforceView: React.FC<WorkforceViewProps> = ({
                 className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] px-2 rounded-xl transition-colors"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="flex size-10 items-center justify-center rounded-full mansa-profile-avatar border border-white/10 text-xs font-bold font-mono">
-                    {worker.avatar}
-                  </div>
+
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-white text-xs">{worker.name}</span>
@@ -347,7 +345,7 @@ export const WorkforceView: React.FC<WorkforceViewProps> = ({
         contentClassName="max-w-md mx-auto"
       >
         <div className="w-full rounded-2xl border border-white/10 bg-[#121316] p-6 shadow-2xl space-y-4">
-          
+
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
               <Users className="size-5 text-[#0055ff]" />

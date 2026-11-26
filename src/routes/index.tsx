@@ -19,13 +19,7 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       ...(hasConfiguredSiteUrl() ? [{ property: "og:url", content: siteUrl("/") }] : []),
-      ...(hasConfiguredSiteUrl()
-        ? [{ property: "og:image", content: siteUrl("/social-share-placeholder.svg") }]
-        : []),
       { name: "twitter:card", content: "summary_large_image" },
-      ...(hasConfiguredSiteUrl()
-        ? [{ name: "twitter:image", content: siteUrl("/social-share-placeholder.svg") }]
-        : []),
     ],
     links: hasConfiguredSiteUrl() ? [{ rel: "canonical", href: siteUrl("/") }] : [],
   }),

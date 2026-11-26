@@ -182,13 +182,7 @@ export const SupportInboxView: React.FC<SupportInboxViewProps> = ({
                     }}
                     className={`flex w-full items-start gap-3 border-b border-white/[0.06] p-4 text-left ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}`}
                   >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full mansa-profile-avatar text-xs font-bold">
-                      {isMember ? (
-                        conversation.memberName.charAt(0).toUpperCase()
-                      ) : (
-                        <UserRound className="size-4" />
-                      )}
-                    </div>
+
                     <div className="min-w-0">
                       <div className="truncate text-xs font-semibold text-white">
                         {isMember ? companyName : conversation.memberName}
@@ -224,13 +218,7 @@ export const SupportInboxView: React.FC<SupportInboxViewProps> = ({
                 >
                   <ArrowLeft className="size-4" />
                 </button>
-                <div className="flex size-9 items-center justify-center rounded-full mansa-profile-avatar text-xs font-bold">
-                  {isMember ? (
-                    companyName?.charAt(0).toUpperCase() || "A"
-                  ) : (
-                    <UserRound className="size-4" />
-                  )}
-                </div>
+
                 <div>
                   <div className="text-sm font-semibold text-white">
                     {isMember ? companyName : selectedConversation.memberName}

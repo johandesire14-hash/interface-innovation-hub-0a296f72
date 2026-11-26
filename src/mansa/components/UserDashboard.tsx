@@ -1,3 +1,4 @@
+import { ProfileImage } from "./common/ProfileImage";
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   Search,
@@ -1820,8 +1821,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
           id: activeWorkspaceId,
           companyId: activeWorkspaceId,
           companyName: "Cadre financier",
-          companyBanner:
-            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85",
+          companyBanner: "",
           companyLogo: "",
           companyInitials: "FF",
           productName: "Financial Framework Pro & VIP Discord",
@@ -1934,9 +1934,9 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
               setIsAccountSettingsModalOpen(true);
             }}
             aria-label={lang === "fr" ? "Ouvrir les paramètres du compte" : "Open account settings"}
-            className="flex size-8 items-center justify-center rounded-full mansa-profile-avatar text-xs font-bold hover:brightness-110 transition-[filter] cursor-pointer border border-white/10"
+            className="flex size-8 items-center justify-center rounded-full text-xs font-bold hover:brightness-110 transition-[filter] cursor-pointer border border-white/10"
           >
-            {user?.avatarInitials || "JO"}
+            {profile?.photoURL ? <ProfileImage src={profile.photoURL} alt={user?.name || "Profil"} className="size-full rounded-full object-cover" /> : <Settings className="size-4" />}
           </button>
         </div>
       </header>
@@ -2155,13 +2155,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                           alt={comp.name}
                           className="size-full object-cover mansa-avatar-image"
                         />
-                      ) : (
-                        <div className="size-full mansa-profile-avatar flex items-center justify-center text-[10px] font-black font-mono">
-                          <span>
-                            {comp.logoInitials || comp.name.substring(0, 2).toUpperCase() || "EN"}
-                          </span>
-                        </div>
-                      )}
+                      ) : null}
                     </button>
                   );
                 })}
@@ -2596,15 +2590,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                               alt={comp.name}
                               className="size-full object-cover mansa-avatar-image"
                             />
-                          ) : (
-                            <div className="size-full mansa-profile-avatar flex items-center justify-center text-[10px] font-black font-mono">
-                              <span>
-                                {comp.logoInitials ||
-                                  comp.name.substring(0, 2).toUpperCase() ||
-                                  "EN"}
-                              </span>
-                            </div>
-                          )}
+                          ) : null}
                         </button>
                       );
                     })}
@@ -3113,9 +3099,9 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                           className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="flex size-9 items-center justify-center rounded-full mansa-profile-avatar text-xs font-bold border border-white/10">
-                              {user?.avatarInitials || "JO"}
-                            </div>
+                            {profile?.photoURL && <div className="flex size-9 items-center justify-center rounded-full overflow-hidden">
+                              <ProfileImage src={profile?.photoURL} alt={user?.name || "Profil"} className="size-full rounded-full object-cover" />
+                            </div>}
                             <div>
                               <span className="text-xs font-semibold text-white block">
                                 {activeCompany ? activeCompany.name : "Personnel"}
@@ -4462,9 +4448,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
               }}
               className="flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-[10px] font-semibold text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
             >
-              <div className="flex size-5 items-center justify-center rounded-full mansa-profile-avatar text-[9px]">
-                {user?.avatarInitials || "U"}
-              </div>
+              <Settings className="size-5" />
               <span>Compte</span>
             </button>
           </div>

@@ -332,11 +332,7 @@ export const PartnersView: React.FC<PartnersViewProps> = ({
                       alt={deal.partnerName}
                       className="size-11 rounded-xl object-cover border border-white/10 bg-zinc-800 mansa-avatar-image"
                     />
-                  ) : (
-                    <div className="flex size-11 shrink-0 items-center justify-center rounded-xl mansa-profile-avatar text-sm font-bold">
-                      {deal.partnerName.trim().slice(0, 2).toUpperCase() || "PA"}
-                    </div>
-                  )}
+                  ) : null}
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-sm text-white">{deal.partnerName}</h3>

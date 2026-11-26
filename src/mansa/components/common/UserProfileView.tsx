@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ProfileImage } from "./ProfileImage";
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -101,9 +102,7 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({
           <div className="mx-auto max-w-2xl space-y-4">
             <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/10 to-[#181a1f] p-5">
               <div className="flex items-center gap-4">
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-2xl font-bold text-emerald-300">
-                  {displayName[0]?.toUpperCase() || "U"}
-                </div>
+                <ProfileImage src={profile?.photoURL} alt={displayName} className="size-16 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0">
                   <h1 className="truncate text-xl font-bold text-white">{displayName}</h1>
                   <p className="truncate text-sm text-emerald-300">Nom d’utilisateur : {handle}</p>

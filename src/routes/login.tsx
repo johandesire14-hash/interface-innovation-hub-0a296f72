@@ -4,6 +4,14 @@ import { LoginPage } from "@/mansa/components/LoginPage";
 import { useAuth } from "@/mansa/context/AuthContext";
 
 export const Route = createFileRoute("/login")({
+  head: () => ({ meta: [
+    { title: "Connexion — afhub" },
+    { name: "description", content: "Connectez-vous à votre compte afhub." },
+    { property: "og:title", content: "Connexion — afhub" },
+    { property: "og:description", content: "Connectez-vous à votre compte afhub." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (
     search: Record<string, unknown>,
   ): { mode: "login" | "signup"; reason?: "session" } => ({

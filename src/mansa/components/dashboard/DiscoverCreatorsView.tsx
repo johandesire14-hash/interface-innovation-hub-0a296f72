@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ProfileImage } from "../common/ProfileImage";
 import React, { useState } from "react";
 import {
   Search,
@@ -376,13 +377,13 @@ export const DiscoverCreatorsView: React.FC<DiscoverCreatorsViewProps> = ({
               className="group rounded-2xl border border-white/10 bg-[#12141c] hover:border-white/20 transition-colors duration-150 overflow-hidden flex flex-col cursor-pointer shadow-lg"
             >
               {/* 1. PHOTO EN HAUT, FORMAT LARGE */}
-              <div className="relative h-32 sm:h-36 w-full overflow-hidden bg-zinc-900 shrink-0">
-                <img
+              {enterprise.bannerUrl && <div className="relative h-32 sm:h-36 w-full overflow-hidden shrink-0">
+                <ProfileImage
                   src={enterprise.bannerUrl}
                   alt={enterprise.companyName}
                   className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </div>
+              </div>}
 
               <div className="p-4 flex flex-1 flex-col gap-2">
                 {/* 2. NOM DE L'ENTREPRISE À GAUCHE, ÉTOILE + NOTE À DROITE */}

@@ -480,9 +480,7 @@ export const AccountSettingsModal: React.FC<AccountSettingsModalProps> = ({
         <div className="flex justify-center pt-3"><span className="h-1.5 w-16 rounded-full bg-white/15" aria-hidden="true" /></div>
         <div className="flex items-center justify-between px-7 pb-4 pt-5">
           <div className="flex items-center gap-3">
-            <div className="flex size-12 items-center justify-center rounded-full border border-white/10 bg-[#252830] text-sm font-bold text-white">
-              {user?.avatarInitials || user?.name?.slice(0, 2).toUpperCase() || "U"}
-            </div>
+
             <div>
               <p className="text-lg font-semibold text-white">{user.name}</p>
               <button type="button" onClick={() => { setActiveTab("profil"); setMobileMenuOpen(false); }} className="text-sm text-zinc-400 hover:text-white">Voir le profil</button>

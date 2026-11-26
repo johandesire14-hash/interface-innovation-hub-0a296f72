@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ProfileImage } from "../common/ProfileImage";
 import React, { useState } from "react";
 import {
   Home,
@@ -312,8 +313,8 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
         ...previous,
         companyName: company.name || previous.companyName,
         description: company.description || previous.description,
-        companyBanner: company.companyBanner || previous.companyBanner,
-        companyLogo: company.companyLogo || previous.companyLogo,
+        companyBanner: company.companyBanner ?? "",
+        companyLogo: company.companyLogo ?? "",
       }));
     });
   }, [companyId]);
@@ -1735,8 +1736,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
         billingCycle: "monthly",
         description: `Accédez aux services officiels proposés par ${currentSub.companyName}.`,
         imageUrl:
-          currentSub.companyBanner ||
-          "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80",
+          currentSub.companyBanner || "",
         includedApps: ["dashboard", "support", featureKey],
       }
     );
@@ -2241,20 +2241,15 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
         {/* Top Mini Card of Enterprise matching screenshot */}
         <div className="flex items-center justify-between p-2.5 rounded-2xl bg-[#14161b] border border-white/5 shadow-sm">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="relative size-9 rounded-xl mansa-profile-avatar border border-white/15 flex items-center justify-center text-xs font-black shrink-0 overflow-hidden shadow-inner">
+            {subscription.companyLogo && <div className="relative size-9 rounded-xl border border-white/15 flex items-center justify-center text-xs font-black shrink-0 overflow-hidden shadow-inner">
               {subscription.companyLogo ? (
                 <img
                   src={subscription.companyLogo}
                   alt={subscription.companyName}
                   className="size-full object-cover mansa-avatar-image"
                 />
-              ) : (
-                <span>
-                  {subscription.companyInitials ||
-                    subscription.companyName.substring(0, 2).toUpperCase()}
-                </span>
-              )}
-            </div>
+              ) : null}
+            </div>}
             <div className="min-w-0">
               <h2 className="text-xs font-bold text-white truncate tracking-tight">
                 {subscription.companyName}
@@ -2728,32 +2723,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                       alt={item.companyName || item.name}
                       className="size-full object-cover mansa-avatar-image"
                     />
-                  ) : item.type === "whop_yellow" ? (
-                    <div className="size-full bg-[#D8FF3F] text-black font-black text-lg flex items-center justify-center">
-                      W
-                    </div>
-                  ) : item.type === "green_stripes" ? (
-                    <div className="size-full bg-[#0b1712] border border-emerald-500/30 text-emerald-400 flex flex-col items-center justify-center gap-0.5">
-                      <span className="w-5 h-1 bg-emerald-400 rounded-full" />
-                      <span className="w-3.5 h-1 bg-emerald-400/70 rounded-full" />
-                    </div>
-                  ) : item.type === "purple_shield" ? (
-                    <div className="size-full bg-[#13111f] border border-purple-500/30 text-purple-400 flex items-center justify-center">
-                      <ShieldCheck className="size-5" />
-                    </div>
-                  ) : (
-                    <div
-                      className={`size-full bg-gradient-to-br ${
-                        item.companyGradient || "from-blue-950 via-indigo-950 to-black"
-                      } flex items-center justify-center text-[10px] font-black text-white font-mono`}
-                    >
-                      <span>
-                        {item.companyInitials ||
-                          item.initials ||
-                          (item.companyName || item.name || "EM").substring(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  ) : null}
                 </button>
 
                 <div className="absolute left-[72px] z-50 px-2.5 py-1 rounded-lg bg-[#181a22] text-xs font-semibold text-white border border-white/10 shadow-xl whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150">
@@ -2838,12 +2808,9 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                   </button>
                   <h1 className="text-base font-semibold text-white">Accueil</h1>
                 </div>
-                <div className="relative w-full h-44 sm:h-64 md:h-72 lg:h-80 overflow-hidden bg-[#111216] select-none group">
-                  <img
-                    src={
-                      currentSub.companyBanner ||
-                      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80"
-                    }
+                <div className={`relative w-full ${currentSub.companyBanner ? "h-44 sm:h-64 md:h-72 lg:h-80" : "h-16"} overflow-hidden select-none group`}>
+                  <ProfileImage
+                    src={currentSub.companyBanner}
                     alt={`Bannière ${currentSub.companyName}`}
                     className="w-full h-full object-cover object-center"
                   />
@@ -2885,9 +2852,9 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                 {/* 2. BLOC D'INFORMATIONS */}
                 <div className="px-4 sm:px-8 lg:px-10 relative">
                   {/* Photo de profil carrée aux coins arrondis superposée sur le coin inférieur gauche de la bannière */}
-                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 -mt-12 sm:-mt-18 md:-mt-22 mb-4">
+                  <div className={`flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 ${currentSub.companyBanner && currentSub.companyLogo ? "-mt-12 sm:-mt-18 md:-mt-22" : "mt-4"} mb-4`}>
                     <div className="flex items-end gap-3 sm:gap-5">
-                      <div
+                      {currentSub.companyLogo && <div
                         onClick={() => canManageCompany && setIsBrandingModalOpen(true)}
                         className={`relative size-24 sm:size-36 md:size-40 rounded-2xl sm:rounded-3xl border-4 border-[#0a0b0d] bg-[#14161f] shadow-2xl overflow-hidden shrink-0 ${
                           canManageCompany ? "group cursor-pointer" : "cursor-default select-none"
@@ -2904,12 +2871,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                             alt={currentSub.companyName}
                             className={`size-full object-cover mansa-avatar-image ${canManageCompany ? "group-hover:scale-105" : ""} transition-transform duration-300`}
                           />
-                        ) : (
-                          <div className="size-full mansa-profile-avatar flex items-center justify-center text-3xl sm:text-4xl font-black">
-                            {currentSub.companyInitials ||
-                              currentSub.companyName.substring(0, 2).toUpperCase()}
-                          </div>
-                        )}
+                        ) : null}
                         {/* Hover overlay with Camera to edit - Uniquement pour le créateur propriétaire */}
                         {canManageCompany && (
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1 select-none">
@@ -2924,7 +2886,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                           className="absolute bottom-2 sm:bottom-2.5 right-2 sm:right-2.5 size-3 sm:size-4 rounded-full bg-emerald-400 ring-4 ring-[#0a0b0d]"
                           title="Espace d'entreprise actif"
                         />
-                      </div>
+                      </div>}
                     </div>
 
                     {/* Des icônes d'action et de gestion alignées à l'extrême droite */}
@@ -3149,11 +3111,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                                     alt={subscription.companyName}
                                     className="size-full object-cover mansa-avatar-image"
                                   />
-                                ) : (
-                                  <div className="size-full mansa-profile-avatar flex items-center justify-center text-xs font-black">
-                                    {subscription.companyInitials || "VIP"}
-                                  </div>
-                                )}
+                                ) : null}
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">

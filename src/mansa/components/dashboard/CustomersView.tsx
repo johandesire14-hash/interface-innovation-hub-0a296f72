@@ -481,11 +481,8 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                     {/* Name & Email with Avatar and Country Flag */}
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className="flex size-8 items-center justify-center rounded-full mansa-profile-avatar border border-white/10 text-xs font-bold shrink-0">
-                            {c.avatar}
-                          </div>
-                          <span className="absolute -bottom-1 -right-1 text-xs leading-none">
+                        <div>
+                          <span className="text-xs leading-none">
                             {c.countryFlag}
                           </span>
                         </div>
@@ -661,9 +658,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
           <div className="max-h-[88dvh] w-full overflow-y-auto rounded-3xl border border-white/10 bg-[#111214] p-4 shadow-2xl sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-4 pb-5">
               <div className="flex min-w-0 items-center gap-4">
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-full mansa-profile-avatar border border-white/10 text-xl font-medium">
-                  {selectedCustomer.avatar || selectedCustomer.name.slice(0, 2).toUpperCase()}
-                </div>
+
                 <div className="min-w-0">
                   <h2 className="truncate text-2xl font-semibold text-white">
                     {selectedCustomer.name}

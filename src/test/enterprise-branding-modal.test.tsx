@@ -45,6 +45,13 @@ beforeEach(() => {
 });
 
 describe("EnterpriseBrandingModal file replacement", () => {
+  it("saves no banner or profile photo when the user has not chosen any", async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    render(<EnterpriseBrandingModal isOpen onClose={vi.fn()} company={{ id: "empty-company", name: "Sans image" }} ownerUid="creator-1" onSave={onSave} />);
+    fireEvent.click(screen.getByRole("button", { name: "Enregistrer les modifications" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ companyBanner: "", companyLogo: "" })));
+    expect(uploadMock).not.toHaveBeenCalled();
+  });
   it("previews selected files, uploads both assets and passes Firebase URLs to onSave", async () => {
     const { onSave } = renderModal();
     const fileInputs = document.querySelectorAll<HTMLInputElement>('input[type="file"]');

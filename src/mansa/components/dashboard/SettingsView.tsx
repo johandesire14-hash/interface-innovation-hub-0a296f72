@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ProfileImage } from "../common/ProfileImage";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Globe,
@@ -91,7 +92,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   // Enterprise Banner & Profile Photo State
   const [companyBanner, setCompanyBanner] = useState<string>(
-    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85",
+    "",
   );
   const [companyLogo, setCompanyLogo] = useState<string>("");
 
@@ -238,8 +239,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             if (target.bankName) setBankName(target.bankName);
             if (target.bankIbanRib) setBankIbanRib(target.bankIbanRib);
             if (target.bankAccountHolder) setBankAccountHolder(target.bankAccountHolder);
-            if (target.companyBanner) setCompanyBanner(target.companyBanner);
-            if (target.companyLogo) setCompanyLogo(target.companyLogo);
+            setCompanyBanner(target.companyBanner || "");
+            setCompanyLogo(target.companyLogo || "");
           } else if (isMounted) {
             setStoreName(activeCompanyName || "Mon Entreprise");
           }
@@ -642,11 +643,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     Aperçu en direct de votre marque
                   </label>
                   <div className="relative w-full h-36 sm:h-44 rounded-2xl overflow-hidden border border-white/10 bg-[#14161f] shadow-inner group">
-                    <img
-                      src={
-                        companyBanner ||
-                        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85"
-                      }
+                    <ProfileImage
+                      src={companyBanner}
                       alt="Aperçu de la bannière"
                       className="w-full h-full object-cover"
                     />
@@ -654,20 +652,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
                     {/* Profile Photo Overlaid */}
                     <div className="absolute bottom-3 left-4 flex items-end gap-3 z-10">
-                      <div className="relative size-16 sm:size-20 rounded-2xl border-2 border-black bg-[#121316] shadow-xl overflow-hidden shrink-0">
+                      {companyLogo && <div className="relative size-16 sm:size-20 rounded-2xl border-2 border-black bg-[#121316] shadow-xl overflow-hidden shrink-0">
                         {companyLogo ? (
                           <img
                             src={companyLogo}
                             alt="Aperçu du logo"
                             className="size-full object-cover mansa-avatar-image"
                           />
-                        ) : (
-                          <div className="flex size-full items-center justify-center mansa-profile-avatar text-xl font-black">
-                            {storeName.trim().slice(0, 2).toUpperCase() || "AF"}
-                          </div>
-                        )}
+                        ) : null}
                         <span className="absolute bottom-1 right-1 size-2.5 rounded-full bg-emerald-400 ring-2 ring-black" />
-                      </div>
+                      </div>}
                       <div className="text-white drop-shadow-md pb-0.5">
                         <h4 className="text-sm font-bold tracking-tight">
                           {storeName || "Mon Entreprise"}
