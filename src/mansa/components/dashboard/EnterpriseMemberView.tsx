@@ -3817,13 +3817,13 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                 ];
           return (
             <div className="fixed inset-0 z-40 overflow-y-auto bg-black/85 p-2 backdrop-blur-md sm:p-4">
-              {isAffiliateSharePageOpen && affiliateLinkUrl && (
+              {isAffiliateSharePageOpen && (
                 <ProductAffiliateSharePage
                   productName={offer.title}
                   {...(offer.imageUrl || offer.bannerUrl
                     ? { productImage: offer.imageUrl || offer.bannerUrl }
                     : {})}
-                  affiliateUrl={affiliateLinkUrl}
+                  affiliateUrl={affiliateLinkUrl || undefined}
                   isCreatingLink={isCreatingAffiliateLink}
                   linkError={affiliateLinkError}
                   onBack={() => setIsAffiliateSharePageOpen(false)}
