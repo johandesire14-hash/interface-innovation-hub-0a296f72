@@ -84,6 +84,13 @@ export const mapOfferRowToPlatformOffer = (
     discordChannels: extras?.discordChannels || [],
     courses: extras?.courses || [],
     ebooks: extras?.ebooks || [],
+    affiliateCommissionRate:
+      typeof row.metadata?.affiliateCommissionRate === "number" &&
+      Number.isFinite(row.metadata.affiliateCommissionRate) &&
+      row.metadata.affiliateCommissionRate >= 0 &&
+      row.metadata.affiliateCommissionRate <= 100
+        ? row.metadata.affiliateCommissionRate
+        : 0,
   };
 };
 

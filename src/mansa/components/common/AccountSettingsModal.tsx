@@ -41,6 +41,7 @@ import {
 import { subscribeToCreatorTransactions } from "../../services/dbService";
 import { supabase } from "../../services/supabase";
 import { CustomerPurchasesView } from "../dashboard/CustomerPurchasesView";
+import { UserProfileLink } from "./UserProfileLink";
 import { ActivityView } from "./ActivityView";
 import { AccountPortfolioTab } from "./AccountPortfolioTab";
 import { useModalDismiss } from "../../hooks/useModalDismiss";
@@ -482,7 +483,9 @@ export const AccountSettingsModal: React.FC<AccountSettingsModalProps> = ({
           <div className="flex items-center gap-3">
 
             <div>
-              <p className="text-lg font-semibold text-white">{user.name}</p>
+              <UserProfileLink userId={user.uid} className="text-lg font-semibold text-white">
+                {user.name}
+              </UserProfileLink>
             </div>
           </div>
           {isModal && onClose && <button type="button" onClick={onClose} aria-label="Fermer" className="rounded-full p-2 text-zinc-400 hover:bg-white/10 hover:text-white"><X className="size-5" /></button>}

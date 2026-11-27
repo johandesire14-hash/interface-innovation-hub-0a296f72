@@ -15,6 +15,7 @@ export interface LocalSupportMessage {
 export interface LocalSupportConversation {
   id: string;
   companyId: string;
+  memberUid?: string;
   memberName: string;
   memberEmail: string;
   messages: LocalSupportMessage[];
@@ -134,6 +135,7 @@ export function getLocalSupportConversation(
 
 export function appendLocalSupportMessage(input: {
   companyId: string;
+  memberUid?: string;
   memberEmail: string;
   memberName: string;
   sender: LocalSupportMessage["sender"];
@@ -156,12 +158,14 @@ export function appendLocalSupportMessage(input: {
   const nextConversation: LocalSupportConversation = existing
     ? {
         ...existing,
+        memberUid: input.memberUid || existing.memberUid,
         memberName: input.memberName || existing.memberName,
         messages: [...existing.messages, nextMessage],
       }
     : {
         id: `${input.companyId}:${input.memberEmail.trim().toLowerCase()}`,
         companyId: input.companyId,
+        ...(input.memberUid ? { memberUid: input.memberUid } : {}),
         memberName: input.memberName || "Membre",
         memberEmail: input.memberEmail.trim().toLowerCase(),
         messages: [nextMessage],

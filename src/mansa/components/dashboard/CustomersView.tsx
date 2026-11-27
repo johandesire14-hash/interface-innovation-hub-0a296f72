@@ -668,7 +668,9 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
                 <div className="min-w-0">
                   <h2 className="truncate text-2xl font-semibold text-white">
-                    {selectedCustomer.name}
+                    <UserProfileLink userId={selectedCustomer.memberId}>
+                      {selectedCustomer.name}
+                    </UserProfileLink>
                   </h2>
                   <p className="truncate text-sm text-zinc-400">
                     @{selectedCustomer.discordUsername || selectedCustomer.email.split("@")[0]}

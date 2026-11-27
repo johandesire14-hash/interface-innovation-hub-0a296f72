@@ -66,6 +66,7 @@ import { CompanySocialIcons } from "./CompanySocialIcons";
 import { EnterpriseSubscription, TelegramChannelItem, DiscordChannelItem } from "../../types";
 import { ConnectedAppsView, TelegramIcon, DiscordIcon } from "./ConnectedAppsView";
 import { SupportInboxView } from "./SupportInboxView";
+import { UserProfileLink } from "../common/UserProfileLink";
 import { OfferCheckoutModal, CreatorPlatformOffer } from "./OfferCheckoutModal";
 import {
   saveSubscription,
@@ -727,7 +728,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
   const [expandedCommentsMap, setExpandedCommentsMap] = useState<Record<string, boolean>>({});
   const [commentInputMap, setCommentInputMap] = useState<Record<string, string>>({});
   const [postCommentsMap, setPostCommentsMap] = useState<
-    Record<string, Array<{ author: string; text: string; time: string }>>
+    Record<string, Array<{ author: string; authorUid?: string; text: string; time: string }>>
   >(() => {
     try {
       const raw = localStorage.getItem("mansa_post_comments_storage");
@@ -741,7 +742,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
     const text = (commentInputMap[postId] || "").trim();
     if (!text) return;
     const authorName = user?.name || "Membre";
-    const newComment = { author: authorName, text, time: "À l'instant" };
+    const newComment = { author: authorName, authorUid: user?.uid, text, time: "À l'instant" };
     const currentList = postCommentsMap[postId] || [];
     const nextList = [...currentList, newComment];
     const nextMap = { ...postCommentsMap, [postId]: nextList };
@@ -2186,6 +2187,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
     const companyId = subscription.companyId || subscription.id;
     const persistedConversation = appendLocalSupportMessage({
       companyId,
+      memberUid: user?.uid,
       memberEmail: user?.email || "membre@mansa.app",
       memberName: user?.name || "Membre",
       sender: "member",
@@ -2225,6 +2227,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
 
       const persistedAutoReply = appendLocalSupportMessage({
         companyId: compId,
+        memberUid: user?.uid,
         memberEmail: user?.email || "membre@mansa.app",
         memberName: user?.name || "Membre",
         sender: "creator",
@@ -3339,9 +3342,12 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                                       className="border-b border-white/5 pb-2 last:border-0 last:pb-0"
                                     >
                                       <div className="flex items-center justify-between gap-2">
-                                        <span className="text-[11px] font-semibold text-white">
+                                        <UserProfileLink
+                                          userId={reply.authorUid}
+                                          className="text-[11px] font-semibold text-white"
+                                        >
                                           {reply.author}
-                                        </span>
+                                        </UserProfileLink>
                                         <span className="text-[10px] text-zinc-500">
                                           {reply.time}
                                         </span>
@@ -3497,6 +3503,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
               {
                 id: `${subscription.companyId || subscription.id}:${user?.email || "membre@mansa.app"}`,
                 companyId: subscription.companyId || subscription.id,
+                memberUid: user?.uid,
                 memberName: user?.name || "Membre",
                 memberEmail: user?.email || "membre@mansa.app",
                 messages: supportChatList.map((message) => ({
@@ -3852,6 +3859,26 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                   <div className="flex shrink-0 items-center gap-2">
                     <button
                       type="button"
+                      onClick={() => {
+                        if (isCompanyOwner) {
+                          setAffiliateLinkError("Le créateur ne peut pas s’affilier à sa propre offre.");
+                          return;
+                        }
+                        if (Number(offer.affiliateCommissionRate || 0) <= 0) {
+                          setAffiliateLinkError("Le créateur n’a pas activé l’affiliation pour ce produit.");
+                          return;
+                        }
+                        void handleCopyAffiliateLink(offer, true);
+                      }}
+                      disabled={isCreatingAffiliateLink}
+                      aria-label="Partager"
+                      title="Partager"
+                      className="flex size-8 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-50"
+                    >
+                      <Share2 className="size-4" />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setSelectedProductDetailOffer(null)}
                       aria-label="Fermer la fiche produit"
                       className="flex size-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
@@ -3977,16 +4004,6 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                               {affiliateLinkUrl}
                             </a>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => void handleCopyAffiliateLink(offer, true)}
-                            disabled={isCreatingAffiliateLink}
-                            aria-label={affiliateLinkButtonLabel}
-                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-black disabled:opacity-60"
-                          >
-                            <Share2 className="size-4" />
-                            {isCreatingAffiliateLink ? "Préparation…" : isAffiliateLinkCopied ? "Lien prêt à partager" : "Partager"}
-                          </button>
                           {affiliateLinkError && <p className="text-xs text-rose-300" role="alert">{affiliateLinkError}</p>}
                           {isAffiliateLinkCopied && typeof navigator.share !== "function" && (
                             <p className="text-xs text-zinc-400" role="status">Lien copié dans le presse-papiers.</p>

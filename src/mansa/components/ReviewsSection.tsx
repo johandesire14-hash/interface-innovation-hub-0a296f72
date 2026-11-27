@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { MessageSquare, Star } from "lucide-react";
+import { UserProfileLink } from "./common/UserProfileLink";
 
 interface Review {
   id: string;
   authorName: string;
+  authorUid?: string;
   companyName?: string;
   text: string;
   rating: number;
@@ -61,7 +63,9 @@ export const ReviewsSection: React.FC = () => {
                 </div>
                 <p className="text-sm leading-relaxed text-[#444]">{review.text}</p>
                 <footer className="mt-5 border-t border-black/10 pt-4 text-xs text-[#686868]">
-                  <strong className="text-[#171717]">{review.authorName}</strong>
+                  <strong className="text-[#171717]">
+                    <UserProfileLink userId={review.authorUid}>{review.authorName}</UserProfileLink>
+                  </strong>
                   {review.companyName ? ` · ${review.companyName}` : ""}
                 </footer>
               </article>

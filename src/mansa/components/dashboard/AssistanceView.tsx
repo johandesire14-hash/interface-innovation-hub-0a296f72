@@ -109,6 +109,7 @@ export const AssistanceView: React.FC<AssistanceViewProps> = ({
   const sendReply = (conversation: SupportInboxConversation, text: string) => {
     appendLocalSupportMessage({
       companyId: conversation.companyId,
+      memberUid: conversation.memberUid,
       memberEmail: conversation.memberEmail,
       memberName: conversation.memberName,
       sender: "creator",

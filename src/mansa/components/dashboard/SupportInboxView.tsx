@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { ArrowLeft, MessageSquare, Search, Send, UserRound } from "lucide-react";
+import { UserProfileLink } from "../common/UserProfileLink";
 
 const formatMessageTime = (value?: string) => {
   if (!value) return "";
@@ -35,6 +36,7 @@ export interface SupportInboxMessage {
 export interface SupportInboxConversation {
   id: string;
   companyId: string;
+  memberUid?: string;
   memberName: string;
   memberEmail: string;
   messages: SupportInboxMessage[];
@@ -173,28 +175,47 @@ export const SupportInboxView: React.FC<SupportInboxViewProps> = ({
                 const last = conversation.messages[conversation.messages.length - 1];
                 const isSelected = selectedConversationId === conversation.id;
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={conversation.id}
-                    onClick={() => {
-                      onSelectConversation(conversation.id);
-                      setReply("");
-                    }}
-                    className={`flex w-full items-start gap-3 border-b border-white/[0.06] p-4 text-left ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}`}
+                    className={`border-b border-white/[0.06] p-4 ${isSelected ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"}`}
                   >
-
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold text-white">
-                        {isMember ? companyName : conversation.memberName}
-                      </div>
-                      <div className="truncate text-[11px] text-zinc-500">
-                        {isMember ? "Assistance officielle" : conversation.memberEmail}
-                      </div>
-                      <div className="mt-1 truncate text-[11px] text-zinc-400">
-                        {last?.text || "Nouvelle conversation"}
-                      </div>
+                    <div className="flex items-center justify-between gap-2">
+                      {isMember ? (
+                        <span className="truncate text-xs font-semibold text-white">{companyName}</span>
+                      ) : (
+                        <UserProfileLink
+                          userId={conversation.memberUid}
+                          className="truncate text-xs font-semibold text-white"
+                        >
+                          {conversation.memberName}
+                        </UserProfileLink>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectConversation(conversation.id);
+                          setReply("");
+                        }}
+                        className="rounded p-1 text-zinc-400 hover:text-white"
+                        aria-label="Ouvrir la conversation"
+                      >
+                        <MessageSquare className="size-4" />
+                      </button>
                     </div>
-                  </button>
+                    <div className="truncate text-[11px] text-zinc-500">
+                      {isMember ? "Assistance officielle" : conversation.memberEmail}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectConversation(conversation.id);
+                        setReply("");
+                      }}
+                      className="mt-1 block w-full truncate text-left text-[11px] text-zinc-400"
+                    >
+                      {last?.text || "Nouvelle conversation"}
+                    </button>
+                  </div>
                 );
               })
             )}
@@ -220,9 +241,16 @@ export const SupportInboxView: React.FC<SupportInboxViewProps> = ({
                 </button>
 
                 <div>
-                  <div className="text-sm font-semibold text-white">
-                    {isMember ? companyName : selectedConversation.memberName}
-                  </div>
+                  {isMember ? (
+                    <div className="text-sm font-semibold text-white">{companyName}</div>
+                  ) : (
+                    <UserProfileLink
+                      userId={selectedConversation.memberUid}
+                      className="text-sm font-semibold text-white"
+                    >
+                      {selectedConversation.memberName}
+                    </UserProfileLink>
+                  )}
                   <div className="text-[11px] text-zinc-500">
                     {isMember ? "Assistance officielle" : selectedConversation.memberEmail}
                   </div>

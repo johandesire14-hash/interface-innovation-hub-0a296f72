@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { getUserProfileMock, updateUserProfileMock } = vi.hoisted(() => ({
@@ -14,6 +15,9 @@ vi.mock("@/mansa/services/dbService", () => ({
 
 vi.mock("@/mansa/components/dashboard/CustomerPurchasesView", () => ({
   CustomerPurchasesView: () => null,
+}));
+vi.mock("@/mansa/components/common/UserProfileLink", () => ({
+  UserProfileLink: ({ children }: { children: ReactNode }) => <span>{children}</span>,
 }));
 vi.mock("@/mansa/components/common/AccountPortfolioTab", () => ({
   AccountPortfolioTab: () => null,
