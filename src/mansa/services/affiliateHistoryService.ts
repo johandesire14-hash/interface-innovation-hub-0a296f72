@@ -4,6 +4,8 @@ import { db } from "./firebase";
 export interface AffiliateInvitation {
   id: string;
   inviteeName: string;
+  inviteeUsername?: string;
+  inviteeUid?: string;
   inviteeEmail: string;
   productId: string;
   productName: string;
@@ -40,7 +42,13 @@ export async function getAffiliateInvitationHistory(
       const amount = Number(raw["amountNumber"] ?? raw["amount"]);
       return {
         id: document.id,
-        inviteeName: String(raw["buyerName"] || raw["customerName"] || "Invité sans nom"),
+        inviteeName: String(raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"] || raw["buyerName"] || raw["customerName"] || "Invité sans nom"),
+        ...(typeof (raw["buyerUid"] || raw["buyerId"] || raw["customerUid"] || raw["customerId"] || raw["userId"]) === "string"
+          ? { inviteeUid: String(raw["buyerUid"] || raw["buyerId"] || raw["customerUid"] || raw["customerId"] || raw["userId"]) }
+          : {}),
+        ...(typeof (raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"]) === "string"
+          ? { inviteeUsername: String(raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"]) }
+          : {}),
         inviteeEmail: String(raw["buyerEmail"] || raw["customerEmail"] || ""),
         productId: String(raw["productId"] || raw["referralProductId"] || ""),
         productName: String(raw["productName"] || "Produit affilié"),
@@ -69,7 +77,13 @@ export async function getCreatorAffiliateSales(creatorUid: string): Promise<Affi
     return [
       {
         id: document.id,
-        inviteeName: String(raw["buyerName"] || raw["customerName"] || "Client"),
+        inviteeName: String(raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"] || raw["buyerName"] || raw["customerName"] || "Client"),
+        ...(typeof (raw["buyerUid"] || raw["buyerId"] || raw["customerUid"] || raw["customerId"] || raw["userId"]) === "string"
+          ? { inviteeUid: String(raw["buyerUid"] || raw["buyerId"] || raw["customerUid"] || raw["customerId"] || raw["userId"]) }
+          : {}),
+        ...(typeof (raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"]) === "string"
+          ? { inviteeUsername: String(raw["buyerUsername"] || raw["customerUsername"] || raw["inviteeUsername"]) }
+          : {}),
         inviteeEmail: String(raw["buyerEmail"] || raw["customerEmail"] || ""),
         productId: String(raw["productId"] || raw["referralProductId"] || ""),
         productName: String(raw["productName"] || "Produit"),

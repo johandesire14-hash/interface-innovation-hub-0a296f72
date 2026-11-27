@@ -37,6 +37,7 @@ import { affiliateTab } from "./AffiliateTable";
 import { AffiliateHistory } from "./AffiliateHistory";
 import { PersonalAffiliateRevenue } from "./PersonalAffiliateRevenue";
 import { matchesAffiliateSale } from "./affiliatePresentation";
+import { UserProfileLink } from "../common/UserProfileLink";
 
 interface AffiliatesViewProps {
   lang?: "fr" | "en";
@@ -380,14 +381,6 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
           >
             <History className="size-3.5" /> Historique des invitations
           </button>
-          <button
-            type="button"
-            onClick={() => void refresh(true)}
-            disabled={refreshing || loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-white/5 disabled:opacity-50"
-          >
-            <RefreshCw className={`size-3.5 ${refreshing ? "animate-spin" : ""}`} /> Actualiser
-          </button>
         </div>
       </div>
       {!affiliateUid && (
@@ -635,7 +628,9 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-white">{invitation.inviteeName}</p>
+                            <UserProfileLink userId={invitation.inviteeUid} className="block truncate text-sm font-semibold text-white">
+                              {invitation.inviteeUsername || invitation.inviteeName}
+                            </UserProfileLink>
                             <p className="truncate text-xs text-zinc-500">{maskEmail(invitation.inviteeEmail)}</p>
                             <p className="mt-1 text-xs text-zinc-400">{invitation.productName}</p>
                           </div>

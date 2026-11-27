@@ -24,6 +24,7 @@ export interface OfferRow {
   status: "draft" | "active" | "paused" | "archived";
   included_apps: string[];
   image_url: string | null;
+  metadata?: Record<string, unknown> | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -113,7 +114,13 @@ export const mapOfferRowToBusinessProject = (
     ],
     techStack: ["Mansa Engine", "Fichiers sécurisés"],
     estimatedMonthlyRevenue: 0,
-    affiliateCommissionRate: 25,
+    affiliateCommissionRate:
+      typeof row.metadata?.affiliateCommissionRate === "number" &&
+      Number.isFinite(row.metadata.affiliateCommissionRate) &&
+      row.metadata.affiliateCommissionRate >= 0 &&
+      row.metadata.affiliateCommissionRate <= 100
+        ? row.metadata.affiliateCommissionRate
+        : 0,
     membersCount: activeUsers,
     conversionRate: "0%",
     apps: Array.isArray(row.included_apps) ? row.included_apps : [],
@@ -393,6 +400,7 @@ export async function upsertOfferToSupabase(input: {
   courseModules?: any[];
   telegramChannels?: TelegramChannelItem[];
   discordChannels?: DiscordChannelItem[];
+  affiliateRate?: number;
 }): Promise<string> {
   const {
     data: { user },
@@ -416,6 +424,21 @@ export async function upsertOfferToSupabase(input: {
 
   const isFree = input.pricingType === "free" || input.priceAmount === 0;
 
+  let affiliateMetadata: Record<string, unknown> | undefined;
+  if (input.affiliateRate !== undefined) {
+    const { data: currentOffer, error: metadataError } = await supabase
+      .from("offers")
+      .select("metadata")
+      .eq("id", offerId)
+      .maybeSingle();
+    if (metadataError) throw new Error("Impossible de lire les paramètres du programme affilié.");
+    const currentMetadata =
+      currentOffer?.metadata && typeof currentOffer.metadata === "object"
+        ? currentOffer.metadata as Record<string, unknown>
+        : {};
+    affiliateMetadata = { ...currentMetadata, affiliateCommissionRate: input.affiliateRate };
+  }
+
   // 1. Offre principale
   const offerPayload = {
     id: offerId,
@@ -431,6 +454,7 @@ export async function upsertOfferToSupabase(input: {
     status: input.status || "active",
     included_apps: input.includedApps || [], // JSONB
     image_url: input.imageUrl || null,
+    ...(affiliateMetadata ? { metadata: affiliateMetadata } : {}),
   };
 
   const { error: offerError } = await supabase
@@ -563,6 +587,36 @@ export async function upsertOfferToSupabase(input: {
   }
 
   return offerId;
+}
+
+export async function updateOfferAffiliateCommission(offerId: string, rate: number): Promise<void> {
+  if (!offerId) throw new Error("Produit introuvable.");
+  if (!Number.isFinite(rate) || rate < 0 || rate > 100) {
+    throw new Error("Le taux doit être compris entre 0 et 100 %.");
+  }
+
+  const { data: authData } = await supabase.auth.getUser();
+  const creatorId = authData.user?.id;
+  if (!creatorId) throw new Error("Connectez-vous pour modifier la commission.");
+  const { data: currentOffer, error: readError } = await supabase
+    .from("offers")
+    .select("metadata, creator_id")
+    .eq("id", offerId)
+    .maybeSingle();
+  if (readError || !currentOffer) throw new Error("Impossible de charger ce produit.");
+  if (currentOffer.creator_id !== creatorId) throw new Error("Vous n’êtes pas autorisé à modifier ce produit.");
+  const currentMetadata =
+    currentOffer.metadata && typeof currentOffer.metadata === "object"
+      ? currentOffer.metadata as Record<string, unknown>
+      : {};
+  const { data, error } = await supabase
+    .from("offers")
+    .update({ metadata: { ...currentMetadata, affiliateCommissionRate: rate } })
+    .eq("id", offerId)
+    .eq("creator_id", creatorId)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) throw new Error("Impossible d’enregistrer le taux affilié.");
 }
 
 export interface CreatorCourseModuleInput {

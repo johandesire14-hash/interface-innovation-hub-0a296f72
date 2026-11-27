@@ -397,7 +397,7 @@ export const AccountSettingsModal: React.FC<AccountSettingsModalProps> = ({
   if (isModal && !isOpen) return null;
 
   const handleCopyProfileLink = () => {
-    const link = siteUrl(`/@${username}`);
+    const link = siteUrl(`/profile/${encodeURIComponent(userId)}`);
     navigator.clipboard.writeText(link);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
@@ -483,7 +483,6 @@ export const AccountSettingsModal: React.FC<AccountSettingsModalProps> = ({
 
             <div>
               <p className="text-lg font-semibold text-white">{user.name}</p>
-              <button type="button" onClick={() => { setActiveTab("profil"); setMobileMenuOpen(false); }} className="text-sm text-zinc-400 hover:text-white">Voir le profil</button>
             </div>
           </div>
           {isModal && onClose && <button type="button" onClick={onClose} aria-label="Fermer" className="rounded-full p-2 text-zinc-400 hover:bg-white/10 hover:text-white"><X className="size-5" /></button>}

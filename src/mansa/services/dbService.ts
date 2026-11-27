@@ -28,6 +28,7 @@ import { safeStorage } from "../utils/storage";
 import { getSavedCompanies } from "../utils/companyStorage";
 import { filterPersonalTransactions } from "../utils/companyScope";
 import { PRODUCTS_UPDATED_EVENT, dispatchProductUpdates } from "../utils/productUpdateEvents";
+import { updateOfferAffiliateCommission } from "./supabaseOfferService";
 import { convertProjectToPlatformOffer, getOffersForCompany } from "../utils/rightsAccessEngine";
 import {
   fetchCreatorOffersFromSupabase,
@@ -759,6 +760,7 @@ export async function saveProductToFirestore(
     billingCycle: (productData.billingCycle as any) || "monthly",
     status,
     includedApps: productData.includedApps || [],
+    affiliateRate: productData.affiliateRate,
     imageUrl: productData.coverImage || productData.bannerUrl,
     digitalFiles: productData.digitalFiles,
     courseModules: productData.courseModules,
@@ -766,6 +768,11 @@ export async function saveProductToFirestore(
 
   dispatchProductUpdates();
   return productId;
+}
+
+export async function updateOfferAffiliateRate(offerId: string, rate: number): Promise<void> {
+  await updateOfferAffiliateCommission(offerId, rate);
+  dispatchProductUpdates();
 }
 
 export async function deleteProductFromFirestore(

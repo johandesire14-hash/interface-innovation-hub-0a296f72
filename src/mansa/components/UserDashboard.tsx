@@ -51,7 +51,6 @@ import {
   CheckCircle2,
   Bot,
   BookOpen,
-  RefreshCw,
   Trash2,
   ShoppingBag,
   Heart,
@@ -164,6 +163,7 @@ import {
   subscribeToCreatorCustomers,
   createRealTransaction,
   loadVerifiedMemberContent,
+  updateOfferAffiliateRate,
   FirestoreTransaction,
   FirestoreCustomer,
 } from "../services/dbService";
@@ -1616,13 +1616,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
     }, 380);
   };
 
-  const handleRefreshData = () => {
-    setIsTabLoading(true);
-    setTimeout(() => {
-      setIsTabLoading(false);
-    }, 500);
-  };
-
   // Sync real-time African pulse feed strictly from real Firestore transactions
   useEffect(() => {
     const previousIds = previousPulseIdsRef.current;
@@ -1902,15 +1895,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
         {/* Right Navigation Icons */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Refresh Data with Skeleton simulator */}
-          <button
-            onClick={handleRefreshData}
-            className="hidden sm:flex p-1.5 text-zinc-400 hover:text-[#00D26A] transition-colors cursor-pointer rounded-lg hover:bg-white/5 min-h-[36px] min-w-[36px] items-center justify-center"
-            title={lang === "fr" ? "Actualiser les données" : "Refresh data"}
-          >
-            <RefreshCw className={`size-4 ${isTabLoading ? "animate-spin text-[#00D26A]" : ""}`} />
-          </button>
-
           <button
             onClick={() => switchTab("decouvrir")}
             className="hidden sm:flex p-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/5 min-h-[36px] min-w-[36px] items-center justify-center"
@@ -4129,12 +4113,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                         ? { rate: projects.find((project) => project.id === product.id)?.affiliateCommissionRate }
                         : {}),
                     }))}
-                    onEditOffer={(id) => {
-                      const product = contextProducts.find((offer) => offer.id === id);
-                      if (!product) return;
-                      setEditingProduct(product);
-                      setIsProductStudioOpen(true);
-                    }}
+                    onUpdateRate={updateOfferAffiliateRate}
                   />
                 </React.Suspense>
               ) : (

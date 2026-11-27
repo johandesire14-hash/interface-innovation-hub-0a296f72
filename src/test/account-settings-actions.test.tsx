@@ -9,6 +9,7 @@ const { getUserProfileMock, updateUserProfileMock } = vi.hoisted(() => ({
 vi.mock("@/mansa/services/dbService", () => ({
   getUserProfile: getUserProfileMock,
   updateUserProfile: updateUserProfileMock,
+  subscribeToCreatorTransactions: vi.fn(() => () => {}),
 }));
 
 vi.mock("@/mansa/components/dashboard/CustomerPurchasesView", () => ({

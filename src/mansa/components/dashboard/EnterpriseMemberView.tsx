@@ -252,15 +252,16 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
   const [affiliateLinkError, setAffiliateLinkError] = useState<string>("");
   const [isCreatingAffiliateLink, setIsCreatingAffiliateLink] = useState(false);
   const [isAffiliateLinkCopied, setIsAffiliateLinkCopied] = useState(false);
+  const [affiliateLinkUrl, setAffiliateLinkUrl] = useState("");
   const affiliateLinkButtonLabel = isCreatingAffiliateLink
     ? "Création du lien d’affiliation"
     : affiliateLinkError
       ? affiliateLinkError
       : isAffiliateLinkCopied
         ? "Lien d’affiliation copié"
-        : "Copier le lien d’affiliation";
+        : "Partager le lien d’affiliation";
 
-  const handleCopyAffiliateLink = async (offer: CreatorPlatformOffer) => {
+  const handleCopyAffiliateLink = async (offer: CreatorPlatformOffer, share = false) => {
     setAffiliateLinkError("");
     setIsAffiliateLinkCopied(false);
     if (!user?.uid) {
@@ -279,10 +280,20 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
         affiliateCommissionRate: rate,
       });
       const url = siteUrl(`/affiliate/${encodeURIComponent(link.code)}`);
-      await navigator.clipboard.writeText(url);
+      setAffiliateLinkUrl(url);
+      if (share && typeof navigator.share === "function") {
+        await navigator.share({
+          title: offer.title,
+          text: "Deviens affilié et gagne l’argent sur ta commission",
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
       setIsAffiliateLinkCopied(true);
       window.setTimeout(() => setIsAffiliateLinkCopied(false), 2500);
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
       console.error("Affiliate link creation failed:", error);
       setAffiliateLinkError(
         getUserFacingErrorMessage(error, "Impossible de créer le lien affilié. Réessayez."),
@@ -2439,6 +2450,8 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                         } else {
                           setCompanyTab("produits");
                           setActiveTab("accueil");
+                          setAffiliateLinkUrl("");
+                          setIsAffiliateLinkCopied(false);
                           setSelectedProductDetailOffer(offer);
                           setSelectedProductPlanId(offer.pricingOptions?.[0]?.id || null);
                           setExpandedProductFaqIndex(null);
@@ -3405,7 +3418,11 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                           <button
                             key={offer.id}
                             type="button"
-                            onClick={() => setSelectedProductDetailOffer(offer)}
+                            onClick={() => {
+                              setAffiliateLinkUrl("");
+                              setIsAffiliateLinkCopied(false);
+                              setSelectedProductDetailOffer(offer);
+                            }}
                             className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111318] text-left transition-colors duration-150 hover:border-white/20 focus:outline-none"
                           >
                             <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-900">
@@ -3833,24 +3850,6 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    {!isCompanyOwner && (
-                      <button
-                        type="button"
-                        onClick={() => void handleCopyAffiliateLink(offer)}
-                        disabled={isCreatingAffiliateLink}
-                        aria-label={affiliateLinkButtonLabel}
-                        title={affiliateLinkButtonLabel}
-                        className={`flex size-8 items-center justify-center rounded-full border transition-colors ${
-                          isAffiliateLinkCopied
-                            ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
-                            : affiliateLinkError
-                              ? "border-rose-400/40 bg-rose-500/10 text-rose-300"
-                              : "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
-                        } disabled:cursor-wait disabled:opacity-60`}
-                      >
-                        <Share2 className="size-4" aria-hidden="true" />
-                      </button>
-                    )}
                     <button
                       type="button"
                       onClick={() => setSelectedProductDetailOffer(null)}
@@ -3943,11 +3942,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                             alt={offer.title}
                             className="size-full object-cover"
                           />
-                        ) : (
-                          <div className="flex size-full items-center justify-center text-xs text-zinc-500">
-                            Ajouter une image de rappel produit
-                          </div>
-                        )}
+                        ) : null}
                       </div>
                       <h2 className="text-base font-bold leading-snug text-white">{offer.title}</h2>
                       <div className="space-y-1 border-b border-white/10 pb-3">
@@ -3972,6 +3967,32 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                           )}
                         </div>
                       </div>
+                      {!isCompanyOwner && Number(offer.affiliateCommissionRate || 0) > 0 && (
+                        <section className="space-y-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+                          <p className="text-xs leading-relaxed text-zinc-300">
+                            Deviens affilié et gagne l’argent sur ta commission.
+                          </p>
+                          {affiliateLinkUrl && (
+                            <a href={affiliateLinkUrl} className="block break-all text-xs text-emerald-300 underline">
+                              {affiliateLinkUrl}
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyAffiliateLink(offer, true)}
+                            disabled={isCreatingAffiliateLink}
+                            aria-label={affiliateLinkButtonLabel}
+                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-black disabled:opacity-60"
+                          >
+                            <Share2 className="size-4" />
+                            {isCreatingAffiliateLink ? "Préparation…" : isAffiliateLinkCopied ? "Lien prêt à partager" : "Partager"}
+                          </button>
+                          {affiliateLinkError && <p className="text-xs text-rose-300" role="alert">{affiliateLinkError}</p>}
+                          {isAffiliateLinkCopied && typeof navigator.share !== "function" && (
+                            <p className="text-xs text-zinc-400" role="status">Lien copié dans le presse-papiers.</p>
+                          )}
+                        </section>
+                      )}
                       {offer.pricingType === "paid" &&
                         !(TEMPORARY_FREE_ACCESS_ENABLED && !canManageCompany) && (
                           <div className="space-y-2">

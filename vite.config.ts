@@ -17,7 +17,10 @@ export default defineConfig({
   },
   vite: {
     server: {
-      allowedHosts: ["5173-iqza0s83l1i7o2j61bip8-ffc082ce.us3.manus.computer"],
+      allowedHosts: [
+        "5173-iqza0s83l1i7o2j61bip8-ffc082ce.us3.manus.computer",
+        "8080-izefknh67osd0i36z6yld-deefc6a8.us5.manus.computer",
+      ],
     },
   },
 });

@@ -95,9 +95,7 @@
 }
 
 .mansa-profile-avatar {
-  background-image:
-    radial-gradient(circle at 24% 18%, rgba(61, 220, 132, 0.28), transparent 48%),
-    linear-gradient(145deg, #17261e 0%, #17191d 58%, #0d0f10 100%);
+  background-image: none;
   border-color: rgba(0, 210, 106, 0.38);
   color: #dcfce7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(0, 210, 106, 0.12);
@@ -353,6 +351,10 @@ button:focus,
 .mansa-dashboard > header,
 .mansa-dashboard .dashboard-canvas {
   background: var(--dashboard-bg) !important;
+}
+
+.mansa-palette [class*="bg-gradient"] {
+  background-image: none !important;
 }
 
 .mansa-dashboard > header {
