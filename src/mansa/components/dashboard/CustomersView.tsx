@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { ConfirmActionModal } from "../common/ConfirmActionModal";
 import { ModalOverlay } from "../common/ModalOverlay";
+import { UserProfileLink } from "../common/UserProfileLink";
 import { useAuth } from "../../context/AuthContext";
 import {
   subscribeToCreatorCustomers,
@@ -220,6 +221,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
             .toUpperCase();
           return {
             id: c.id,
+            memberId: c.memberId || c.userId,
             name: c.name,
             email: c.email,
             avatar: initials,
@@ -488,7 +490,12 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                         </div>
                         <div>
                           <div className="font-bold text-white flex items-center gap-1.5">
-                            <span>{c.name}</span>
+                            <UserProfileLink
+                              userId={c.memberId}
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              {c.name}
+                            </UserProfileLink>
                           </div>
                           <div className="text-[10px] text-zinc-400 flex items-center gap-1">
                             <span>{c.email}</span>

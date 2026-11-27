@@ -477,6 +477,26 @@ export const AffiliatesView: React.FC<AffiliatesViewProps> = ({ currency = "XOF"
                         {product.description}
                       </p>
                     )}
+                    <p className="mt-3 text-xs leading-relaxed text-zinc-300">
+                      Deviens affilié et gagne l’argent sur ta commission.
+                    </p>
+                    {existingLink && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <a
+                          href={publicAffiliateUrl(existingLink.code)}
+                          className="min-w-0 flex-1 break-all text-xs text-emerald-300 underline"
+                        >
+                          {publicAffiliateUrl(existingLink.code)}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => void shareUrl(existingLink)}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-xs font-semibold text-white hover:bg-emerald-500"
+                        >
+                          <Share2 className="size-3.5" /> Partager
+                        </button>
+                      </div>
+                    )}
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                       <span className="text-xs text-zinc-400">
                         {formatProductPrice(
