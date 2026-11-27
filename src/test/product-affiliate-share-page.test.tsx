@@ -18,6 +18,9 @@ describe("ProductAffiliateSharePage", () => {
         name: "Deviens affilié et gagne l’argent sur ta commission.",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Lien affilié à copier" })).toHaveValue(
+      "https://mansa.example/affiliate/ABC123",
+    );
     expect(screen.getByRole("link", { name: "Partager sur WhatsApp" })).toHaveAttribute(
       "href",
       expect.stringContaining(encodeURIComponent("https://mansa.example/affiliate/ABC123")),
@@ -26,5 +29,20 @@ describe("ProductAffiliateSharePage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Retour à la fiche produit" }));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it("affiche la raison si la création du lien échoue au lieu de masquer la page", () => {
+    render(
+      <ProductAffiliateSharePage
+        productName="Cours photo"
+        linkError="La création de liens affiliés n’est pas encore disponible pour ces offres."
+        onBack={() => {}}
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "La création de liens affiliés n’est pas encore disponible pour ces offres.",
+    );
+    expect(screen.queryByRole("textbox", { name: "Lien affilié à copier" })).not.toBeInTheDocument();
   });
 });

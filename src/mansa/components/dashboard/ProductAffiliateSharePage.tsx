@@ -16,7 +16,9 @@ import {
 interface ProductAffiliateSharePageProps {
   productName: string;
   productImage?: string;
-  affiliateUrl: string;
+  affiliateUrl?: string;
+  isCreatingLink?: boolean;
+  linkError?: string;
   onBack: () => void;
 }
 
@@ -27,12 +29,15 @@ export const ProductAffiliateSharePage: React.FC<ProductAffiliateSharePageProps>
   productName,
   productImage,
   affiliateUrl,
+  isCreatingLink = false,
+  linkError = "",
   onBack,
 }) => {
   const [copied, setCopied] = useState(false);
   const [email, setEmail] = useState("");
 
   const copyLink = async () => {
+    if (!affiliateUrl) return;
     try {
       await navigator.clipboard.writeText(affiliateUrl);
       setCopied(true);
@@ -43,6 +48,7 @@ export const ProductAffiliateSharePage: React.FC<ProductAffiliateSharePageProps>
   };
 
   const share = async () => {
+    if (!affiliateUrl) return;
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({
@@ -58,9 +64,9 @@ export const ProductAffiliateSharePage: React.FC<ProductAffiliateSharePageProps>
     await copyLink();
   };
 
-  const message = shareMessage(productName, affiliateUrl);
+  const message = affiliateUrl ? shareMessage(productName, affiliateUrl) : "";
   const encodedMessage = encodeURIComponent(message);
-  const encodedUrl = encodeURIComponent(affiliateUrl);
+  const encodedUrl = encodeURIComponent(affiliateUrl || "");
   const emailHref = email.trim()
     ? `mailto:${encodeURIComponent(email.trim())}?subject=${encodeURIComponent(`Découvre ${productName}`)}&body=${encodeURIComponent(message)}`
     : `mailto:?subject=${encodeURIComponent(`Découvre ${productName}`)}&body=${encodeURIComponent(message)}`;
@@ -109,6 +115,35 @@ export const ProductAffiliateSharePage: React.FC<ProductAffiliateSharePageProps>
           prévue par le créateur, selon les conditions du programme.
         </p>
 
+        {affiliateUrl ? (
+          <div className="mt-7 flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-2">
+            <input
+              readOnly
+              value={affiliateUrl}
+              aria-label="Lien affilié à copier"
+              className="min-w-0 flex-1 bg-transparent px-3 py-3 font-mono text-sm text-white outline-none"
+              onFocus={(event) => event.currentTarget.select()}
+            />
+            <button
+              type="button"
+              onClick={() => void copyLink()}
+              className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-[#191919] hover:bg-zinc-200"
+            >
+              {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+              {copied ? "Copié" : "Copier"}
+            </button>
+          </div>
+        ) : (
+          <p
+            role={linkError ? "alert" : "status"}
+            className={`mt-7 w-full rounded-xl border p-4 text-sm ${linkError ? "border-rose-400/20 bg-rose-400/10 text-rose-200" : "border-white/10 bg-white/[0.04] text-zinc-300"}`}
+          >
+            {linkError || (isCreatingLink ? "Création de votre lien affilié…" : "Le lien affilié n’est pas disponible pour ce produit.")}
+          </p>
+        )}
+
+        {affiliateUrl && (
+          <>
         <div className="mt-8 w-full">
           <button
             type="button"
@@ -190,15 +225,8 @@ export const ProductAffiliateSharePage: React.FC<ProductAffiliateSharePageProps>
             <Send className="size-4" /> Envoyer
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => void copyLink()}
-          className="mt-5 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-zinc-400 hover:bg-white/[0.04] hover:text-white"
-        >
-          {copied ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
-          {copied ? "Lien copié" : "Copier le lien affilié"}
-        </button>
+          </>
+        )}
       </section>
     </main>
   );

@@ -258,7 +258,9 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
 
   const handleOpenAffiliateSharePage = async (offer: CreatorPlatformOffer) => {
     setAffiliateLinkError("");
+    setAffiliateLinkUrl("");
     setIsAffiliateSharePageOpen(false);
+    setIsAffiliateSharePageOpen(true);
     if (!user?.uid) {
       setAffiliateLinkError("Connectez-vous pour créer votre lien personnel.");
       return;
@@ -3822,6 +3824,8 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                     ? { productImage: offer.imageUrl || offer.bannerUrl }
                     : {})}
                   affiliateUrl={affiliateLinkUrl}
+                  isCreatingLink={isCreatingAffiliateLink}
+                  linkError={affiliateLinkError}
                   onBack={() => setIsAffiliateSharePageOpen(false)}
                 />
               )}
@@ -3854,10 +3858,12 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                       onClick={() => {
                         if (isCompanyOwner) {
                           setAffiliateLinkError("Le créateur ne peut pas s’affilier à sa propre offre.");
+                          setIsAffiliateSharePageOpen(true);
                           return;
                         }
                         if (Number(offer.affiliateCommissionRate || 0) <= 0) {
                           setAffiliateLinkError("Le créateur n’a pas activé l’affiliation pour ce produit.");
+                          setIsAffiliateSharePageOpen(true);
                           return;
                         }
                         void handleOpenAffiliateSharePage(offer);
