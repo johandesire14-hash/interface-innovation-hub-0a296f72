@@ -2438,7 +2438,6 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                           setCompanyTab("produits");
                           setActiveTab("accueil");
                           setAffiliateLinkUrl("");
-                          setIsAffiliateLinkCopied(false);
                           setSelectedProductDetailOffer(offer);
                           setSelectedProductPlanId(offer.pricingOptions?.[0]?.id || null);
                           setExpandedProductFaqIndex(null);
@@ -3410,7 +3409,6 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                             type="button"
                             onClick={() => {
                               setAffiliateLinkUrl("");
-                              setIsAffiliateLinkCopied(false);
                               setSelectedProductDetailOffer(offer);
                             }}
                             className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111318] text-left transition-colors duration-150 hover:border-white/20 focus:outline-none"
