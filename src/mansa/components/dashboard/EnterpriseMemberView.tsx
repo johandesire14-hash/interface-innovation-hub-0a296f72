@@ -68,6 +68,7 @@ import { ConnectedAppsView, TelegramIcon, DiscordIcon } from "./ConnectedAppsVie
 import { SupportInboxView } from "./SupportInboxView";
 import { UserProfileLink } from "../common/UserProfileLink";
 import { OfferCheckoutModal, CreatorPlatformOffer } from "./OfferCheckoutModal";
+import { ProductAffiliateSharePage } from "./ProductAffiliateSharePage";
 import {
   saveSubscription,
   updateSubscriptionBranding,
@@ -252,19 +253,12 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
   const [expandedProductFaqIndex, setExpandedProductFaqIndex] = useState<number | null>(null);
   const [affiliateLinkError, setAffiliateLinkError] = useState<string>("");
   const [isCreatingAffiliateLink, setIsCreatingAffiliateLink] = useState(false);
-  const [isAffiliateLinkCopied, setIsAffiliateLinkCopied] = useState(false);
   const [affiliateLinkUrl, setAffiliateLinkUrl] = useState("");
-  const affiliateLinkButtonLabel = isCreatingAffiliateLink
-    ? "Création du lien d’affiliation"
-    : affiliateLinkError
-      ? affiliateLinkError
-      : isAffiliateLinkCopied
-        ? "Lien d’affiliation copié"
-        : "Partager le lien d’affiliation";
+  const [isAffiliateSharePageOpen, setIsAffiliateSharePageOpen] = useState(false);
 
-  const handleCopyAffiliateLink = async (offer: CreatorPlatformOffer, share = false) => {
+  const handleOpenAffiliateSharePage = async (offer: CreatorPlatformOffer) => {
     setAffiliateLinkError("");
-    setIsAffiliateLinkCopied(false);
+    setIsAffiliateSharePageOpen(false);
     if (!user?.uid) {
       setAffiliateLinkError("Connectez-vous pour créer votre lien personnel.");
       return;
@@ -282,17 +276,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
       });
       const url = siteUrl(`/affiliate/${encodeURIComponent(link.code)}`);
       setAffiliateLinkUrl(url);
-      if (share && typeof navigator.share === "function") {
-        await navigator.share({
-          title: offer.title,
-          text: "Deviens affilié et gagne l’argent sur ta commission",
-          url,
-        });
-      } else {
-        await navigator.clipboard.writeText(url);
-      }
-      setIsAffiliateLinkCopied(true);
-      window.setTimeout(() => setIsAffiliateLinkCopied(false), 2500);
+      setIsAffiliateSharePageOpen(true);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       console.error("Affiliate link creation failed:", error);
@@ -3833,6 +3817,16 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                 ];
           return (
             <div className="fixed inset-0 z-40 overflow-y-auto bg-black/85 p-2 backdrop-blur-md sm:p-4">
+              {isAffiliateSharePageOpen && affiliateLinkUrl && (
+                <ProductAffiliateSharePage
+                  productName={offer.title}
+                  {...(offer.imageUrl || offer.bannerUrl
+                    ? { productImage: offer.imageUrl || offer.bannerUrl }
+                    : {})}
+                  affiliateUrl={affiliateLinkUrl}
+                  onBack={() => setIsAffiliateSharePageOpen(false)}
+                />
+              )}
               <div className="mx-auto my-2 w-full max-w-5xl rounded-3xl border border-white/15 bg-[#0e1015] text-white shadow-2xl sm:my-6">
                 <div className="flex items-center justify-between border-b border-white/10 bg-[#14161d] px-4 py-3.5 sm:px-6">
                   <div className="flex min-w-0 items-center gap-3">
@@ -3868,7 +3862,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                           setAffiliateLinkError("Le créateur n’a pas activé l’affiliation pour ce produit.");
                           return;
                         }
-                        void handleCopyAffiliateLink(offer, true);
+                        void handleOpenAffiliateSharePage(offer);
                       }}
                       disabled={isCreatingAffiliateLink}
                       aria-label="Partager"
@@ -3893,9 +3887,7 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                       {affiliateLinkError ||
                         (isCreatingAffiliateLink
                           ? "Création du lien d’affiliation en cours."
-                          : isAffiliateLinkCopied
-                            ? "Lien d’affiliation copié dans le presse-papiers."
-                            : "")}
+                          : "")}
                     </span>
                   </div>
                 </div>
@@ -4005,9 +3997,6 @@ export const EnterpriseMemberView: React.FC<EnterpriseMemberViewProps> = ({
                             </a>
                           )}
                           {affiliateLinkError && <p className="text-xs text-rose-300" role="alert">{affiliateLinkError}</p>}
-                          {isAffiliateLinkCopied && typeof navigator.share !== "function" && (
-                            <p className="text-xs text-zinc-400" role="status">Lien copié dans le presse-papiers.</p>
-                          )}
                         </section>
                       )}
                       {offer.pricingType === "paid" &&
